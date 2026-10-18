@@ -215,6 +215,20 @@ details.how p{font-size:.92rem;color:var(--muted);margin:8px 0 0}
 .tp-row .btn{min-height:38px;padding:8px 12px;font-size:.9rem}
 
 /* Technique example (inside a sheet) */
+.me-steps{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:me}
+.me-steps li{counter-increment:me;display:grid;grid-template-columns:30px 1fr;column-gap:10px;align-items:start;opacity:.55}
+.me-steps li[aria-current]{opacity:1}
+.me-steps li::before{content:counter(me);grid-row:1/span 2;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 .95rem/1 var(--f-label);background:var(--soft);color:var(--ink)}
+.me-steps li[aria-current]::before{background:var(--tape);color:var(--tape-ink)}
+.me-steps b{font:700 1.02rem/1.2 var(--f-label);text-transform:uppercase;letter-spacing:.03em}
+.me-steps span{font-size:.92rem;color:var(--muted)}
+#msMe .ms-body{grid-auto-rows:max-content}
+.me-stage{display:flex;justify-content:center;background:var(--stage);border-radius:10px}
+.me-steps li:not([aria-current]) span{display:none}
+#meCv{display:block;max-width:100%;touch-action:none;cursor:grab;border-radius:10px}
+.me-read{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px;align-items:end}
+.me-read>div>b{display:block;font:700 1.5rem/1.1 var(--f-label)}
+.cap-snap{justify-self:start;margin-top:6px;min-height:38px;padding:8px 12px}
 .demo-stage{display:flex;justify-content:center;background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
 #demoCv{display:block;max-width:100%}
 .demo-cap{margin:0;font-size:1.02rem;min-height:3em}
@@ -398,7 +412,7 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
             <button class="btn icon" id="next" aria-label="Next move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
             <span class="step-count" id="count">—</span>
           </div>
-          <div class="cap-tool" id="capTool" hidden><b id="capToolT"></b><span id="capToolS"></span></div>
+          <div class="cap-tool" id="capTool" hidden><b id="capToolT"></b><span id="capToolS"></span><button type="button" class="btn primary cap-snap" id="capSnap" data-snap hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Snap the climber</button></div>
           <div class="caption" aria-live="polite">
             <h3 id="capTitle">Pick a route colour</h3>
             <p class="sub" id="capSub">Tap one hold of your route on the photo.</p>
@@ -469,21 +483,11 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
             </div>
           </div>
           <p class="hint" id="modeHint">Tap one hold of your route to pick its colour.</p>
+          <div class="btn-row" id="sizeSnapRow" hidden><button class="btn primary" data-snap><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Snap the climber</button></div>
         </div>
 
         <div class="blk" id="blkAbout">
-          <h2><span class="n">3</span>About you</h2>
-          <div class="two">
-            <div class="field">
-              <label class="lbl" for="height">Your height</label>
-              <div class="unit"><input type="number" id="height" min="110" max="215" step="1" value="170" inputmode="numeric"><span>cm</span></div>
-            </div>
-            <div class="field">
-              <label class="lbl" for="span">Arm span</label>
-              <div class="unit"><input type="number" id="span" min="100" max="250" step="1" placeholder="170" inputmode="numeric"><span>cm</span></div>
-            </div>
-          </div>
-          <p class="hint">Arm span is fingertip to fingertip with your arms out to the sides. Most people's is about their height; a longer span lets the climber reach further.</p>
+          <h2><span class="n">3</span>Wall and size</h2>
           <div class="two">
             <div class="field">
               <label class="lbl" for="wallM">Wall height</label>
@@ -514,7 +518,9 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
           <div class="size-box">
             <span class="lbl">Real size</span>
             <p class="size-note" id="sizeNote" data-ok="true"></p>
+            <p class="size-note" id="meNote" data-ok="false"></p>
             <div class="btn-row">
+              <button class="btn primary" data-snap><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Snap the climber</button>
               <button class="btn" id="sizeBtn" aria-pressed="false">Check size</button>
               <button class="btn" id="sizeReset" hidden>Use the edges it found</button>
             </div>
@@ -694,6 +700,33 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
       <div class="demo-lock" id="demoLock" hidden><p>This example is part of Rocksane Pro.</p><button type="button" class="btn primary" id="demoUnlock">See Rocksane Pro</button></div>
       <ul class="tips" id="demoTips"></ul>
       <div class="demo-types" id="demoTypes" role="group" aria-label="Other hold types"></div>
+    </div>
+  </div>
+</div>
+<div class="msheet" id="msMe" hidden>
+  <div class="ms-back" data-close></div>
+  <div class="ms-card" role="dialog" aria-modal="true" aria-labelledby="msMeT">
+    <div class="ms-head"><span class="ms-grab" aria-hidden="true"></span><h2 id="msMeT">Your size</h2><button type="button" class="ms-x" data-close>Cancel</button></div>
+    <div class="ms-body">
+      <ol class="me-steps">
+        <li id="meS1" aria-current="step"><b>Snap the climber</b><span>Stand at the foot of the wall with your back to the camera and your arms straight out to the sides. Get the whole wall in the photo, from the mats to the top.</span></li>
+        <li id="meS2"><b>Match the figure</b><span>Drag the yellow dots onto the climber: the top of the head, the fingertips of each hand and the feet. Drag the middle of the figure to move it. Check the Floor and Top lines.</span></li>
+      </ol>
+      <div class="btn-row" id="meSnapRow">
+        <label class="btn primary" for="fileMe" id="meSnap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Take photo</label>
+      </div>
+      <input type="file" id="fileMe" accept="image/*" hidden>
+      <div class="me-stage" id="meStage" hidden><canvas id="meCv" role="img" aria-label="Your photo with the figure to match"></canvas></div>
+      <div class="me-read" id="meRead" hidden>
+        <div><span class="lbl">Height</span><b id="meH">—</b></div>
+        <div><span class="lbl">Arm span</span><b id="meSpan">—</b></div>
+        <div class="field"><label class="lbl" for="meWall">Wall height</label><div class="unit"><input type="number" id="meWall" min="1.5" max="9" step="0.1" value="4.2" inputmode="decimal"><span>m</span></div></div>
+      </div>
+      <p class="note" id="meWarn" hidden></p>
+      <div class="btn-row" id="meDo" hidden>
+        <button type="button" class="btn primary" id="meUse">Use this size</button>
+        <label class="btn" for="fileMe">Snap again</label>
+      </div>
     </div>
   </div>
 </div>
@@ -2779,25 +2812,20 @@ function updateStats(){
   else if(act>45) msg='A lot of matches. Move the slider toward Strict, or turn on Show what matched to see what is being picked up.';
   wn.hidden=!msg; wn.textContent=msg;
 }
-const heightEl=$('#height'),wallEl=$('#wallM'),feetEl=$('#feet');
-heightEl.value=S.heightCm; feetEl.value=S.feet;
-const spanEl=$('#span'),angleEl=$('#angle');
-spanEl.placeholder=S.heightCm; if(S.spanCm) spanEl.value=S.spanCm;
+/* The climber's height and arm span come from Snap the climber (below),
+   not from typed numbers. */
+const wallEl=$('#wallM'),feetEl=$('#feet');
+feetEl.value=S.feet;
+const angleEl=$('#angle');
 angleEl.value=String(S.angle||0); if(angleEl.value!==String(S.angle||0)){ S.angle=0; angleEl.value='0'; }
-spanEl.addEventListener('change',()=>{
-  const raw=spanEl.value.trim();
-  if(!raw){ S.spanCm=0; store.set('span',0); solveSoon(); return; }
-  const v=Math.max(100,Math.min(250,Math.round(+raw)||S.heightCm)); spanEl.value=v; S.spanCm=v; store.set('span',v); solveSoon();
-});
 angleEl.addEventListener('change',()=>{ S.angle=+angleEl.value||0; store.set('angle',S.angle); if(!isMoving()) render(); solveSoon(); });
-heightEl.addEventListener('change',()=>{ const v=Math.max(110,Math.min(215,+heightEl.value||170)); heightEl.value=v; S.heightCm=v; store.set('height',v); $('#span').placeholder=v; solveSoon(); });
 wallEl.addEventListener('change',()=>{ const v=Math.max(1.5,Math.min(9,+wallEl.value||4)); wallEl.value=v; S.wallM=v; if(S.src&&S.src.kind!=='sample'){ S.userWallM=v; store.set('wallM',v); } updateSizeUi(); if(!isMoving()) render(); solveSoon(); });
 feetEl.addEventListener('change',()=>{ S.feet=feetEl.value; store.set('feet',S.feet); solveSoon(); });
 $('#callout').addEventListener('change',e=>{ S.callout=e.target.checked; if(S.callout&&S.beta) speak(S.beta.steps[S.step].title); });
 /* Tapping the wall: first pick the colour, then choose a tool and tap a hold.
    The tools stay off until a colour is picked. */
 const TOOLS=['add','remove','type','start','top'];
-const MODEHINT={size:'Drag the Floor line to where the wall meets the mats and the Top line to the top edge of the wall. The climber standing on the mat is drawn at your real height, so you can check it against the holds.',
+const MODEHINT={size:'Drag the Floor line to where the wall meets the mats and the Top line to the top edge of the wall. The climber standing on the mat is drawn at your real height, so you can check it against the holds. To use your own height and arm span, tap Snap the climber.',
   pick:'Tap one hold of your route to pick its colour.',
   none:'Colour picked. To change a hold, choose Add hold, Remove hold, Hold type, Set start or Set top, then tap the hold.',
   type:'Tap a ringed hold and choose what type it is: jug, crimp, sloper and so on. The plan and the tips use it.',
@@ -2821,6 +2849,7 @@ function setMode(m){
   if(m==='pick'&&S.model) hint='Tap a hold to pick a new colour. Picking the same colour again keeps your start, top and hold changes.';
   if(m==='add'&&isMoving()) hint='Tap a dashed amber hold to keep it, or a crossed-out hold to put it back. To add a hold by hand, tap Freeze frame first.';
   $('#modeHint').textContent=hint;
+  $('#sizeSnapRow').hidden=m!=='size';
   updateSizeUi(); toolCaption();
   if(AP.on&&(TOOLS.includes(m)||m==='size')&&AP.detent==='full') goDetent('half');
   if(S.src&&!isMoving()) render();
@@ -2847,6 +2876,9 @@ function updateSizeUi(){
   el.textContent=S.src?SIZENOTE[c.src].replace('{m}',String(S.wallM)):'';
   el.dataset.ok=String(c.src==='edges'||c.src==='marks'||c.src==='sample');
   $('#sizeReset').hidden=!c.marked;
+  const me=$('#meNote'),own=store.get('sizeFrom','')==='photo';
+  me.textContent=own?`Climber: ${S.heightCm} cm tall, ${S.spanCm||S.heightCm} cm arm span, from your photo.`:`Climber: ${S.heightCm} cm tall, the standard size. Tap Snap the climber to use your own height and arm span.`;
+  me.dataset.ok=String(own);
   $('#sizeBtn').setAttribute('aria-pressed',String(S.mode==='size'));
   $('#sizeBtn').textContent=S.mode==='size'?'Done':'Check size';
 }
@@ -3449,6 +3481,204 @@ let lastW=0;
 new ResizeObserver(()=>{ const w=wrap.clientWidth; if(w&&w!==lastW){ lastW=w; fit(); render(); } }).observe(wrap);
 if(document.fonts&&document.fonts.load) document.fonts.load(`16px ${MARKER}`).then(()=>{ if(!isMoving()) render(); }).catch(()=>{});
 
+/* ---------- your size: snap the climber, then match the figure ---------- */
+/* Step 1: a photo of the climber standing at the foot of the wall, back to
+   the camera, arms straight out. Step 2: the figure stands on that photo's
+   floor line at the size the wall gives it; the user drags its head, hands
+   and feet onto the climber (and the Floor and Top lines onto the wall, if
+   they are off). Height = feet to the top of the head and arm span =
+   fingertip to fingertip, in cm from the wall's height in the photo
+   (the same floor-and-top scale as Check size). Everything stays on the
+   phone. Positions are kept in picture units (u = x / width, v = y / height),
+   so moving a line re-measures the same marks. */
+const meEl=$('#msMe'),meCv=$('#meCv'),mctx=meCv.getContext('2d'),meLayers=newLayers();
+const ME={img:null,w:1,h:1,a:1,fl:{a:1,m:0},tp:{a:0,m:0},found:{floor:false,top:false},wallM:S.userWallM||4.2,
+  u:0.5,vf:1,vh:0.5,lh:{u:0.4,v:0.6},rh:{u:0.6,v:0.6},view:{w:1,h:1,dpr:1},drag:null};
+S.me=ME;
+let meVC=null;
+const mMe=Modal(meEl,{onOpen:()=>{ if(!ME.img) ME.wallM=S.userWallM||ME.wallM; $('#meWall').value=ME.wallM; }});
+function meStep(n){ $('#meS1').toggleAttribute('aria-current',n===1); $('#meS2').toggleAttribute('aria-current',n===2); }
+function openMe(opener){
+  meStep(ME.img?2:1);
+  for(const id of ['#meStage','#meRead','#meDo']) $(id).hidden=!ME.img;
+  $('#meSnapRow').hidden=!!ME.img; if(!ME.img) $('#meWarn').hidden=true;
+  mMe.show(opener);
+  if(ME.img) requestAnimationFrame(()=>{ fitMe(); drawMe(); });
+}
+document.querySelectorAll('[data-snap]').forEach(b=>b.addEventListener('click',e=>{ haptic.sel(); if(mSet.open) mSet.hide(); openMe(e.currentTarget); }));
+/* the photo, scaled down, and the wall's floor and top found in it */
+$('#fileMe').addEventListener('change',e=>{
+  const file=e.target.files[0]; e.target.value='';
+  if(!file) return;
+  if(!/^image\//.test(file.type)){ toast('That file is not a photo. Choose a JPEG or PNG.'); return; }
+  const fr=new FileReader();
+  fr.onload=()=>{ const im=new Image(); im.onload=()=>loadMe(im); im.onerror=()=>toast('This photo could not be opened. Try a JPEG or PNG.'); im.src=fr.result; };
+  fr.readAsDataURL(file);
+});
+function loadMe(im){
+  const sw=im.naturalWidth||im.width,sh=im.naturalHeight||im.height,sc=Math.min(1,1400/Math.max(sw,sh));
+  const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(sw*sc)); c.height=Math.max(1,Math.round(sh*sc));
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  ME.img=c; ME.w=c.width; ME.h=c.height; ME.a=c.width/c.height;
+  let fl=null,tp=null;
+  try{
+    meVC=meVC||VisionCore();
+    const sc2=Math.min(1,640/Math.max(c.width,c.height)),g=document.createElement('canvas');
+    g.width=Math.max(1,Math.round(c.width*sc2)); g.height=Math.max(1,Math.round(c.height*sc2));
+    const gx=g.getContext('2d'); gx.drawImage(c,0,0,g.width,g.height);
+    const I=meVC.prepare(gx.getImageData(0,0,g.width,g.height).data,g.width,g.height),f=meVC.wallFrame(I,{});
+    const nl=q=>q?{a:q.c/I.h,m:q.m*I.w/I.h}:null; fl=nl(f.floor); tp=nl(f.top);
+  }catch(err){}
+  if(fl&&tp&&lineAt(fl,0.5)-lineAt(tp,0.5)<0.3){ tp=null; }
+  ME.found={floor:!!fl,top:!!tp};
+  ME.fl=fl||{a:0.94,m:0}; ME.tp=tp||{a:0.03,m:0};
+  /* the figure starts in the middle at the size it had, arms out */
+  ME.u=0.5; ME.vf=lineAt(ME.fl,0.5);
+  const k=meK(),H=S.heightCm,half=(S.spanCm||H)/2;
+  ME.vh=ME.vf-H*k;
+  ME.lh={u:ME.u-half*k/ME.a,v:ME.vf-0.81*H*k}; ME.rh={u:ME.u+half*k/ME.a,v:ME.vf-0.81*H*k};
+  for(const id of ['#meStage','#meRead','#meDo']) $(id).hidden=false;
+  $('#meSnapRow').hidden=true; meStep(2); haptic.ok();
+  requestAnimationFrame(()=>{ fitMe(); drawMe(); });
+}
+/* picture-height units per cm at the figure */
+function meK(){ return (lineAt(ME.fl,ME.u)-lineAt(ME.tp,ME.u))/(ME.wallM*100); }
+function meSize(){
+  const k=meK(); if(!(k>0)) return null;
+  const H=(ME.vf-ME.vh)/k,span=Math.hypot((ME.rh.u-ME.lh.u)*ME.a,ME.rh.v-ME.lh.v)/k;
+  return {H:Math.round(H),span:Math.round(span)};
+}
+function fitMe(){
+  if(!ME.img) return;
+  const box=$('#meStage'),maxW=Math.max(200,box.clientWidth||320),maxH=Math.max(240,Math.min(window.innerHeight*0.56,680));
+  let w=maxW,h=w/ME.a; if(h>maxH){ h=maxH; w=h*ME.a; }
+  w=Math.floor(w); h=Math.floor(h);
+  const dpr=Math.min(window.devicePixelRatio||1,2.5);
+  meCv.style.width=w+'px'; meCv.style.height=h+'px'; meCv.width=Math.round(w*dpr); meCv.height=Math.round(h*dpr);
+  ME.view={w,h,dpr};
+}
+/* the figure in cm (x across from its middle, y up from its feet) */
+function mePose(){
+  const k=meK(),a=ME.a,H=Math.max(60,(ME.vf-ME.vh)/k);
+  const cm=p=>[(p.u-ME.u)*a/k,(ME.vf-p.v)/k];
+  const C=[0,0.505*H],B=upperBody(C,0,H,0.3*H),pose={C,lf:[-0.075*H,0],rf:[0.075*H,0]};
+  /* the dot marks the fingertips; the drawn hand ends a little short of it */
+  let arm=0.2*H;
+  for(const kk of ['lh','rh']){
+    const E=cm(ME[kk]),J=B[kk],d=Math.hypot(E[0]-J[0],E[1]-J[1]),t=d>0.09*H?(d-0.045*H)/d:1;
+    pose[kk]=[J[0]+(E[0]-J[0])*t,J[1]+(E[1]-J[1])*t]; arm=Math.max(arm,d*t);
+  }
+  return {pose,H,arm,k};
+}
+function meDots(){
+  const {w,h}=ME.view;
+  return {head:[ME.u*w,ME.vh*h],feet:[ME.u*w,ME.vf*h],lh:[ME.lh.u*w,ME.lh.v*h],rh:[ME.rh.u*w,ME.rh.v*h]};
+}
+function drawMe(){
+  if(!ME.img||meEl.hidden) return;
+  const {w,h,dpr}=ME.view,g=mctx;
+  g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  g.drawImage(ME.img,0,0,w,h);
+  const lu=ME.u<0.5?0.86:0.14;
+  for(const [l,txt,key] of [[ME.fl,'Floor','floor'],[ME.tp,`Top of wall · ${ME.wallM} m`,'top']]){
+    const ya=lineAt(l,0)*h,yb=lineAt(l,1)*h,hx=lu*w,hy=lineAt(l,lu)*h;
+    g.save(); g.setLineDash([8,6]); g.lineWidth=4; g.strokeStyle='rgba(0,0,0,.7)'; g.beginPath(); g.moveTo(0,ya); g.lineTo(w,yb); g.stroke();
+    g.lineWidth=2; g.strokeStyle='#ffd43b'; g.stroke(); g.setLineDash([]);
+    g.beginPath(); g.arc(hx,hy,11,0,6.283); g.fillStyle='#ffd43b'; g.fill(); g.lineWidth=2.5; g.strokeStyle='rgba(0,0,0,.8)'; g.stroke();
+    g.restore();
+    meTag(g,hx,hy<34?hy+26:hy-26,ME.found[key]||ME.marked?txt:txt.replace(/^(Floor|Top of wall)/,'$1?'));
+  }
+  const {pose,H,arm,k}=mePose(),a=ME.a;
+  if(k>0){
+    const Q=q=>[(ME.u+q[0]*k/a)*w,(ME.vf-q[1]*k)*h];
+    const G=figureGeom(pose,H,0.3*H,arm,Q,{drop:0,lean:0}),F=paintFigure(meLayers,G,H*k*h,dpr);
+    g.save(); g.globalAlpha=0.62; g.drawImage(F.sp,0,0,F.SW,F.SHh,F.box.x,F.box.y,F.SW/dpr,F.SHh/dpr); g.restore();
+  }
+  const D=meDots(),sz=meSize();
+  /* height bracket beside the figure, span line above the hands */
+  g.save(); g.lineCap='round';
+  const bx=Math.max(D.lh[0],D.rh[0])+16>w-40?Math.min(D.lh[0],D.rh[0])-16:Math.max(D.lh[0],D.rh[0])+16;
+  for(const [lw,col] of [[4,'rgba(0,0,0,.7)'],[2,'#ffffff']]){
+    g.lineWidth=lw; g.strokeStyle=col; g.beginPath();
+    g.moveTo(bx,D.feet[1]); g.lineTo(bx,D.head[1]); g.moveTo(bx-6,D.feet[1]); g.lineTo(bx+6,D.feet[1]); g.moveTo(bx-6,D.head[1]); g.lineTo(bx+6,D.head[1]);
+    g.moveTo(D.lh[0],D.lh[1]); g.lineTo(D.rh[0],D.rh[1]);
+    g.stroke();
+  }
+  g.restore();
+  if(sz){
+    meTag(g,bx+(bx>w-60?-32:32),(D.feet[1]+D.head[1])/2,`${sz.H} cm`,'#ffffff','#14181c');
+    meTag(g,(D.lh[0]*3+D.rh[0])/4,(D.lh[1]*3+D.rh[1])/4+17,`${sz.span} cm`,'#ffffff','#14181c');
+  }
+  for(const key of ['head','lh','rh','feet']){
+    const [x,y]=D[key],on=ME.drag&&ME.drag.what===key;
+    g.beginPath(); g.arc(x,y,on?13:10,0,6.283); g.fillStyle='#ffd43b'; g.fill(); g.lineWidth=2.5; g.strokeStyle='rgba(0,0,0,.85)'; g.stroke();
+  }
+  meRead(sz);
+}
+function meTag(g,x,y,text,fill,ink){
+  g.save(); g.font='700 12px "Barlow Condensed",sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+  const tw=g.measureText(text).width+12; x=Math.max(tw/2+2,Math.min(ME.view.w-tw/2-2,x));
+  g.fillStyle=fill||'#ffd43b'; g.beginPath(); g.roundRect?g.roundRect(x-tw/2,y-10,tw,20,5):g.rect(x-tw/2,y-10,tw,20); g.fill();
+  g.fillStyle=ink||'#211c0a'; g.fillText(text,x,y+0.5); g.restore();
+}
+function meRead(sz){
+  $('#meH').textContent=sz?sz.H+' cm':'—'; $('#meSpan').textContent=sz?sz.span+' cm':'—';
+  let warn='';
+  if(!sz) warn='The Floor line must be below the Top line. Drag them onto the wall.';
+  else if(sz.H<100||sz.H>230) warn=`${sz.H} cm tall doesn't look right. Check that the Floor and Top lines sit on the wall and the wall height is right, then match the head and feet again.`;
+  else if(sz.span<0.8*sz.H||sz.span>1.25*sz.H) warn=`An arm span of ${sz.span} cm for ${sz.H} cm tall is unusual. Put the hand dots on the fingertips, with the arms straight out.`;
+  $('#meWarn').hidden=!warn; $('#meWarn').textContent=warn;
+  $('#meUse').disabled=!sz||sz.H<100||sz.H>230||sz.span<70||sz.span>270;
+}
+/* dragging: a dot, a line, or the whole figure */
+function meUV(e){ const r=meCv.getBoundingClientRect(); return {u:(e.clientX-r.left)/r.width,v:(e.clientY-r.top)/r.height,x:e.clientX-r.left,y:e.clientY-r.top}; }
+meCv.addEventListener('pointerdown',e=>{
+  if(!ME.img) return;
+  const p=meUV(e),D=meDots();
+  let what=null,best=Infinity;
+  for(const key in D){ const d=Math.hypot(p.x-D[key][0],p.y-D[key][1]); if(d<28&&d<best){ best=d; what=key; } }
+  if(!what){
+    const {h}=ME.view,lu=ME.u<0.5?0.86:0.14,lw=Math.abs(p.u-lu)<0.2;
+    const df=Math.abs(p.y-lineAt(ME.fl,p.u)*h),dt=Math.abs(p.y-lineAt(ME.tp,p.u)*h);
+    const x0=Math.min(D.lh[0],D.rh[0],D.head[0]-20),x1=Math.max(D.lh[0],D.rh[0],D.head[0]+20);
+    if(p.x>x0&&p.x<x1&&p.y>D.head[1]-10&&p.y<D.feet[1]-6&&!(lw&&Math.min(df,dt)<18)) what='body';
+    else if(Math.min(df,dt)<(lw?30:20)) what=df<=dt?'fl':'tp';
+  }
+  if(!what) return;
+  ME.drag={what,id:e.pointerId,u:p.u,v:p.v};
+  try{ meCv.setPointerCapture(e.pointerId); }catch(_){}
+  haptic.sel(); e.preventDefault(); drawMe();
+});
+meCv.addEventListener('pointermove',e=>{
+  const d=ME.drag; if(!d||e.pointerId!==d.id) return;
+  const p=meUV(e),cl=x=>Math.max(0,Math.min(1,x)),du=p.u-d.u,dv=p.v-d.v; d.u=p.u; d.v=p.v;
+  if(d.what==='head') ME.vh=Math.max(0,Math.min(ME.vf-0.05,p.v));
+  else if(d.what==='feet'){ ME.vf=Math.max(ME.vh+0.05,Math.min(1,p.v)); }
+  else if(d.what==='lh'||d.what==='rh'){ ME[d.what]={u:cl(p.u),v:cl(p.v)}; }
+  else if(d.what==='body'){
+    ME.u=cl(ME.u+du); ME.vf=cl(ME.vf+dv); ME.vh=cl(ME.vh+dv);
+    for(const kk of ['lh','rh']) ME[kk]={u:cl(ME[kk].u+du),v:cl(ME[kk].v+dv)};
+  }else{
+    const l=ME[d.what]; let at=p.v-l.m*p.u;
+    if(d.what==='fl') at=Math.max(at,ME.tp.a+0.15); else at=Math.min(at,ME.fl.a-0.15);
+    ME[d.what]={a:Math.max(-0.5,Math.min(1.5,at)),m:l.m}; ME.marked=true;
+  }
+  drawMe();
+});
+function meEnd(e){ if(!ME.drag||e.pointerId!==ME.drag.id) return; ME.drag=null; drawMe(); }
+meCv.addEventListener('pointerup',meEnd); meCv.addEventListener('pointercancel',meEnd);
+$('#meWall').addEventListener('change',e=>{ const v=Math.max(1.5,Math.min(9,+e.target.value||4.2)); e.target.value=v; ME.wallM=v; drawMe(); });
+$('#meUse').addEventListener('click',()=>{
+  const sz=meSize(); if(!sz) return;
+  S.heightCm=Math.max(100,Math.min(230,sz.H)); S.spanCm=Math.max(70,Math.min(270,sz.span));
+  store.set('height',S.heightCm); store.set('span',S.spanCm); store.set('sizeFrom','photo');
+  mMe.hide(); haptic.ok(); updateSizeUi(); toolCaption();
+  if(S.src&&!isMoving()) render();
+  solveSoon();
+  toast(`Climber set: ${S.heightCm} cm tall, ${S.spanCm} cm arm span`);
+});
+window.addEventListener('resize',()=>{ if(!meEl.hidden&&ME.img){ fitMe(); drawMe(); } });
+
 /* ---------- hold types: the picker ---------- */
 /* The Hold type tool: tap a ringed hold, then choose its type. The choice is
    saved like the other edits (a position on a still picture, the followed
@@ -3849,6 +4079,7 @@ function toolCaption(){
   $('#player').classList.toggle('tooling',on);
   $('#capTool').hidden=!on;
   if(on){ const c=TOOLCAP[m]||['','']; $('#capToolT').textContent=c[0]; $('#capToolS').textContent=m==='size'?($('#sizeNote').textContent+' Drag the lines if they are off.'):c[1]; }
+  $('#capSnap').hidden=!(on&&m==='size');
 }
 appMQ.addEventListener('change',()=>setAppMode(!!NATIVE||appMQ.matches));
 window.addEventListener('resize',()=>{ if(AP.on){ appLayout(); fit(); render(); } });
