@@ -191,6 +191,7 @@ details.how p{font-size:.92rem;color:var(--muted);margin:8px 0 0}
 .gloss dd{margin:2px 0 0;font-size:.92rem;color:var(--muted)}
 .sources{font-size:.92rem;color:var(--muted)}
 .sources ol{margin:6px 0 0;padding-left:1.2em;display:grid;gap:4px}
+.sources .photo-lbl{display:block;margin-top:14px}
 .btn.small{min-height:36px;padding:7px 11px;font-size:.88rem}
 .hicon{width:20px;height:20px;flex:none;color:var(--icon)}
 .hicon .mk{fill:var(--icon-mark)}
@@ -211,6 +212,8 @@ details.how p{font-size:.92rem;color:var(--muted);margin:8px 0 0}
 .tp-b[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
 .tp-b[aria-pressed="true"] .hicon{color:var(--tape)}
 .tp-line{margin:0;font-size:.9rem}
+.tp-info{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:center}
+.tp-photo{width:56px;height:56px;border-radius:8px;object-fit:cover;background:var(--soft);display:block}
 .tp-row{display:flex;flex-wrap:wrap;gap:8px}
 .tp-row .btn{min-height:38px;padding:8px 12px;font-size:.9rem}
 
@@ -239,6 +242,12 @@ details.how p{font-size:.92rem;color:var(--muted);margin:8px 0 0}
 .demo-lock{display:grid;gap:8px;justify-items:start;background:var(--soft);border-radius:10px;padding:12px 14px}
 .demo-lock p{margin:0}
 #demoIcon .hicon{width:28px;height:28px}
+.demo-real{display:grid;grid-template-columns:minmax(96px,132px) minmax(0,1fr);gap:12px;align-items:start}
+.demo-real .tips{margin:0}
+.demo-photo{margin:0;display:grid;gap:4px}
+.demo-photo img{width:100%;height:auto;aspect-ratio:1;border-radius:10px;object-fit:cover;background:var(--soft);display:block}
+.demo-photo figcaption{font-size:.74rem;line-height:1.25;color:var(--muted)}
+.demo-photo a{color:inherit}
 
 /* Modal sheets: a card that rises from the bottom on phones (drag it down
    to close) and a centred card on wide screens. Motion is driven by springs
@@ -353,6 +362,7 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
 .hguide{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:8px}
 .hg{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;background:var(--soft);border-radius:8px;padding:9px 10px}
 .hg .hicon{width:30px;height:30px}
+.hg-photo{width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--panel);display:block}
 .hg b{display:block;font:700 1rem/1.2 var(--f-label);text-transform:uppercase;letter-spacing:.05em}
 .hg span{font-size:.9rem;color:var(--muted)}
 .lcard.wide{grid-column:1/-1}
@@ -393,7 +403,7 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
         <div class="typepick" id="typePick" role="dialog" aria-labelledby="tpTitle" hidden>
           <div class="tp-head"><b id="tpTitle">What type of hold is it?</b><span class="tp-guess" id="tpGuess"></span><button type="button" class="tp-x" id="tpClose" aria-label="Close">×</button></div>
           <div class="tp-grid" id="tpGrid" role="group" aria-label="Hold types"></div>
-          <p class="tp-line" id="tpLine"></p>
+          <div class="tp-info"><img class="tp-photo" id="tpPhoto" alt="" width="56" height="56" decoding="async"><p class="tp-line" id="tpLine"></p></div>
           <div class="tp-row">
             <button type="button" class="btn primary" id="tpShow"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg><span id="tpShowTxt">Show how</span></button>
             <button type="button" class="btn" id="tpClear" hidden>Use the guess</button>
@@ -672,6 +682,8 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
           <li><a href="https://www.jneurosci.org/content/5/7/1688" target="_blank" rel="noopener">Flash and Hogan: The coordination of arm movements (minimum-jerk model)</a></li>
           <li><a href="https://www.vdiffclimbing.com/boulder-basics/" target="_blank" rel="noopener">VDiff Climbing: Bouldering basics and safety</a></li>
         </ol>
+        <span class="lbl photo-lbl">Hold photos (Wikimedia Commons)</span>
+        <ol id="photoCredits"></ol>
       </div>
     </section>
   </main>
@@ -698,7 +710,10 @@ html.app-mode .typepick{position:fixed;left:8px;right:8px;width:auto;bottom:calc
         <span class="step-count" id="demoStep"></span>
       </div>
       <div class="demo-lock" id="demoLock" hidden><p>This example is part of Rocksane Pro.</p><button type="button" class="btn primary" id="demoUnlock">See Rocksane Pro</button></div>
-      <ul class="tips" id="demoTips"></ul>
+      <div class="demo-real">
+        <figure class="demo-photo"><img id="demoPhoto" alt="" width="480" height="480" decoding="async"><figcaption>In real life · <a id="demoCredit" href="#" target="_blank" rel="noopener"></a></figcaption></figure>
+        <ul class="tips" id="demoTips"></ul>
+      </div>
       <div class="demo-types" id="demoTypes" role="group" aria-label="Other hold types"></div>
     </div>
   </div>
@@ -1744,6 +1759,24 @@ const HOLD_TYPES={
   volume:{name:'Volume',grip:'Press with an open palm, or grip its edges.',body:'Great to stand on: step onto it, move your hips over it and stand up.',
     line:'A big shape on the wall. Use its edges, stand on its faces.'}
 };
+/* A real photo of each hold type, from Wikimedia Commons under free licences
+   that allow use in the app with credit (CC BY, CC BY-SA). Square crops at
+   480 px in web/holds/<type>.webp; the Claude artifact gets them inlined as
+   data URIs (build.py fills HOLD_PHOTO_DATA). The Learn tab lists the credits;
+   the cropped versions are shared under each photo's own licence. */
+const HOLD_PHOTO_DATA=null;
+const HOLD_PHOTO={
+  jug:{alt:'A hand wrapped over the lip of a big orange jug',by:'uncarved block',lic:'CC BY 2.0',licUrl:'https://creativecommons.org/licenses/by/2.0/',page:'https://commons.wikimedia.org/wiki/File:Indoor_Climbing_Holds_2.jpg'},
+  crimp:{alt:'Fingertips crimping a thin edge of rock',by:'Anna reg',lic:'CC BY-SA 3.0 AT',licUrl:'https://creativecommons.org/licenses/by-sa/3.0/at/deed.en',page:'https://commons.wikimedia.org/wiki/File:Leistenklettern.jpg'},
+  sloper:{alt:'An open hand flat on a big round sloper',by:'Thomas Pinz',lic:'CC BY-SA 3.0',licUrl:'https://creativecommons.org/licenses/by-sa/3.0/',page:'https://commons.wikimedia.org/wiki/File:Thomasp_auflegegriff.jpg'},
+  pinch:{alt:'Thumb and fingers squeezing a blue pinch',by:'Thomas Pinz',lic:'CC BY-SA 3.0',licUrl:'https://creativecommons.org/licenses/by-sa/3.0/',page:'https://commons.wikimedia.org/wiki/File:Thomasp_zangengriff.jpg'},
+  pocket:{alt:'One finger in a small pocket in the rock',by:'Jarekt Tuszyński',lic:'CC BY-SA 4.0',licUrl:'https://creativecommons.org/licenses/by-sa/4.0/',page:'https://commons.wikimedia.org/wiki/File:Mono_hold.jpeg'},
+  sidepull:{alt:'A hand pulling sideways on an edge that faces sideways',by:'MarkDoliner',lic:'CC BY-SA 2.0',licUrl:'https://creativecommons.org/licenses/by-sa/2.0/',page:'https://commons.wikimedia.org/wiki/File:The_Buttermilk_Boulders_-_15290712346.jpg'},
+  gaston:{alt:'A climber pushing an edge outward with the elbow out',by:'Adanxmorales',lic:'CC BY-SA 4.0',licUrl:'https://creativecommons.org/licenses/by-sa/4.0/',page:'https://commons.wikimedia.org/wiki/File:Baboon%27s_Athlete_Bella_Jariel_on_Karajo_V11(8a).jpg',mod:'cropped, shirt logo blurred'},
+  undercling:{alt:'A hand pulling up on the underside of a hold; the arrow shows the pull',by:'Thomas Pinz',lic:'CC BY-SA 3.0',licUrl:'https://creativecommons.org/licenses/by-sa/3.0/',page:'https://commons.wikimedia.org/wiki/File:Thomasp_untergriff.jpg'},
+  volume:{alt:'A big red triangular volume with small holds bolted on it',by:'Ka23 13',lic:'CC BY-SA 4.0',licUrl:'https://creativecommons.org/licenses/by-sa/4.0/',page:'https://commons.wikimedia.org/wiki/File:ClimbingHolds_20211103_145113.jpg'}
+};
+function holdPhotoSrc(type){ return (HOLD_PHOTO_DATA&&HOLD_PHOTO_DATA[type])||'holds/'+type+'.webp'; }
 /* Icons in a 24 x 24 box: the hold's shape, and its darker gripping edge.
    Sidepull, gaston and undercling are a jug turned to face sideways, toward
    you, or down; `rot` turns the jug icon (radians). */
@@ -3704,6 +3737,7 @@ function fillTypePick(h){
   $('#tpGuess').textContent=cur?`You set it as ${artName(cur)}.`:`From its size and shape it looks like ${artName(g)}. Choose the real type.`;
   tpGrid.querySelectorAll('button').forEach(b=>{ b.setAttribute('aria-pressed',String(b.dataset.type===cur)); b.classList.toggle('guess',!cur&&b.dataset.type===g); });
   $('#tpLine').textContent=HOLD_TYPES[shown].line;
+  const tpPh=$('#tpPhoto'),src=holdPhotoSrc(shown); if(tpPh.getAttribute('src')!==src){ tpPh.src=src; tpPh.alt=HOLD_PHOTO[shown].alt; }
   $('#tpClear').hidden=!cur;
   $('#tpShowTxt').textContent=`Show how: ${HOLD_TYPES[shown].name.toLowerCase()}`;
   tpEl.dataset.show=shown;
@@ -3781,6 +3815,9 @@ function setDemo(ty){
   const T=HOLD_TYPES[ty];
   $('#demoTitle').textContent=DEMOS[ty].title;
   $('#demoIcon').innerHTML=holdIconSvg(ty);
+  const ph=HOLD_PHOTO[ty],cr=$('#demoCredit');
+  $('#demoPhoto').src=holdPhotoSrc(ty); $('#demoPhoto').alt=ph.alt;
+  cr.textContent=`photo: ${ph.by}, ${ph.lic}`; cr.href=ph.page;
   const ul=$('#demoTips'); ul.textContent='';
   for(const t of [T.grip,T.body]){ const li=document.createElement('li'); li.textContent=t; ul.append(li); }
   demoTypes.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.type===ty)));
@@ -3934,16 +3971,26 @@ $('#demoPrev').addEventListener('click',()=>{
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!tpEl.hidden&&!openSheets.length) closeTypePick(); });
 window.addEventListener('resize',()=>{ if(!demoEl.hidden){ fitDemo(); } });
-/* Learn tab: one row per hold type with a button to watch it */
+/* Learn tab: one row per hold type, with a real photo of it and a button
+   to watch it; the photo credits go under the sources. */
 (function(){
   const box=$('#holdGuide'); if(!box) return;
   for(const ty of HOLD_ORDER){
     const T=HOLD_TYPES[ty],row=document.createElement('div'); row.className='hg';
-    const ic=document.createElement('span'); ic.className='hg-ic'; ic.innerHTML=holdIconSvg(ty);
+    const ic=document.createElement('img'); ic.className='hg-photo'; ic.src=holdPhotoSrc(ty); ic.alt=HOLD_PHOTO[ty].alt; ic.width=64; ic.height=64; ic.loading='lazy'; ic.decoding='async';
     const tx=document.createElement('div'); const b=document.createElement('b'); b.textContent=T.name; const sp=document.createElement('span'); sp.textContent=T.line; tx.append(b,sp);
     const bt=document.createElement('button'); bt.type='button'; bt.className='btn small'; bt.textContent='Show me'; bt.setAttribute('aria-label',`Show me how to use ${artName(ty)}`);
     bt.addEventListener('click',()=>openDemo(ty,bt));
     row.append(ic,tx,bt); box.append(row);
+  }
+  const cl=$('#photoCredits');
+  if(cl) for(const ty of HOLD_ORDER){
+    const ph=HOLD_PHOTO[ty],li=document.createElement('li'),b=document.createElement('b'),a=document.createElement('a'),l=document.createElement('a');
+    b.textContent=HOLD_TYPES[ty].name+': ';
+    a.href=ph.page; a.target='_blank'; a.rel='noopener'; a.textContent='photo by '+ph.by;
+    l.href=ph.licUrl; l.target='_blank'; l.rel='noopener'; l.textContent=ph.lic;
+    li.append(b,a,document.createTextNode(', '),l,document.createTextNode(`, ${ph.mod||'cropped'}`));
+    cl.append(li);
   }
 })();
 
